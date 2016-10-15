@@ -1,11 +1,12 @@
-import Leap *
-import sys, thread, time
-
 """
 THE MAIN CODE GOES HERE
 
 
 """
+
+import sys, thread, time
+import Leap 
+from Leap import *
 
 
 
