@@ -5,13 +5,13 @@ THE MAIN CODE GOES HERE
 """
 
 import sys, thread, time
-import Leap 
-from Leap import *
+import Leap
+from Leap import *    # I am just importing the whole LEAP class so don't worry about specific
 
-"""
-Main leap class
-"""
+# THIS class will connect the controller -- the backend process.
+
 class LeapMotionListener(Leap.listener):
+  
   fingerNames = ["Pinky","Index","Middle","Ring","Thumb"]
   boneNames = ["Metacarpal", "Proximal", "Intermediate","Distal"]
   stateNames = ["STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"]
