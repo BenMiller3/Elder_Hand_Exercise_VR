@@ -12,8 +12,44 @@ from Leap import *
 Main leap class
 """
 class LeapMotionListener(Leap.listener):
-  fingerNames = ["pinky","index","middle","ring","thumb"]
+  fingerNames = ["Pinky","Index","Middle","Ring","Thumb"]
+  boneNames = ["Metacarpal", "Proximal", "Intermediate","Distal"]
+  stateNames = ["STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"]
   
+  def on_init(self, controller):
+    print("Initialized")
+    
+  def on_connect(self, controller):
+    print("Motion Sensor Connected")
+    
+    controller.enable_gestrue(Leap.Gesture.TYPE_CIRCLE);
+    controller.enable_gestrue(Leap.Gesture.TYPE_KEY_TAP);
+    controller.enable_gestrue(Leap.Gesture.TYPE_SCREEN+TAP);
+    controller.enable_gestrue(Leap.Gesture.TYPE_SWIPE);
+    
+  def on_disconnect(self, controller):
+    print("Motion Sensor Disconnected")
+    
+  def on_exit(self, controller):
+    print("Exited")
+    
+  def on_frame(self, controller):
+    pass
   
-def __main__():
-  return 0
+def main():
+  listener = LeapMotionListener()
+  controller = Leap.Controller()
+  
+  contoller.add_listener(listener)
+  
+  print("Press ENTER to quit")
+  
+  try:
+    sys.stdin.readline()
+  except KeyboardInterrupts:
+    pass
+  finally:
+    controller.remove_listener(listener)
+    
+if __name__ == "__main__":
+  main()
