@@ -2,6 +2,7 @@ import sys
 import Leap
 import time
 from numpy import inf
+killer = False
 
 
 class SampleListener(Leap.Listener):
@@ -21,6 +22,11 @@ class SampleListener(Leap.Listener):
     def on_exit(self, controller):
         print "Exited"
 
+    level = 0
+    count = 10
+    f_count = 1
+    hand_assert = "right"
+
     def on_frame(self, controller):
         frame = controller.frame()
 
@@ -29,19 +35,90 @@ class SampleListener(Leap.Listener):
             handType = "Left hand" if hand.is_left else "Right hand"
 
             # Fist Gesture
-            if fistGesture(hand):
-                print "You made a fist with your %s" % (handType)
-                time.sleep(2)
+            if self.level == 0:
+                print "Exercise 1"
+                print "Make a fist with your right hand"
+                print "Remaining: %d" % (self.count)
+                self.level += 1
+            if self.level == 1 and self.count > 1:
+                if fistGesture(hand) and hand.is_right:
+                    print "You made a fist with your %s" % (handType)
+                    print "Remaining: %d" % (self.count - 1)
+                    time.sleep(2)
+                    self.count -= 1
+            elif self.level == 1 and self.count == 1:
+                self.count = 10
+                self.level += 1
+                print "Make a fist with your left hand"
+                print "Remaining: %d" % (self.count)
+            elif self.level == 2 and self.count > 1:
+                if fistGesture(hand) and hand.is_left:
+                    print "You made a fist with your %s" % (handType)
+                    print "Remaining: %d" % (self.count - 1)
+                    time.sleep(2)
+                    self.count -= 1
+            elif self.level == 2 and self.count == 1:
+                print "Exercise 2"
+                print "Touch your %s finger to your thumb (%s Hand)" % (self.finger_names[self.f_count], self.hand_assert)
+                self.count = 10
+                self.level += 1
+            elif self.level == 3 and self.count > -1:
+                if self.hand_assert == "right":
+                    # Touch Gesture
+                    if touchGesture(hand):
+                        if touchGesture(hand) == self.f_count:
+                            print self.finger_names[touchGesture(hand)]
+                            if self.f_count < 4:
+                                self.f_count += 1
+                            else:
+                                self.f_count = 1
+                                self.hand_assert = "left"
+                            print "Touch your %s finger to your thumb (%s Hand)" % (self.finger_names[self.f_count], self.hand_assert)
+                            time.sleep(2)
+                        self.count -= 1
+                elif self.hand_assert == "left":
+                    # Touch Gesture
+                    if touchGesture(hand):
+                        if touchGesture(hand) == self.f_count:
+                            print self.finger_names[touchGesture(hand)]
+                            if self.f_count < 4:
+                                self.f_count += 1
+                            else:
+                                self.f_count = 1
+                                self.hand_assert = "right"
+                            print "Touch your %s finger to your thumb (%s Hand)" % (self.finger_names[self.f_count], self.hand_assert)
+                            time.sleep(2)
+                        self.count -= 1
 
-            # Touch Gesture
-            if touchGesture(hand):
-                print self.finger_names[touchGesture(hand)]
-                time.sleep(2)
-
-            # Twist Gesture
-            if twistGesture(hand):
-                print "You twisted your %s" % (handType)
-                time.sleep(2)
+            elif self.level == 3 and self.count == -1:
+                self.count = 10
+                self.level += 1
+                print "Exercise 3"
+                print "Place your right hand horizontally, palm downward"
+                print "Point your fingers towards the screen"
+                print "Rotate your hand until your palm faces upward"
+                print "Remaining: %d" % (self.count)
+            elif self.level == 4 and self.count > 1:
+                # Twist Gesture
+                if twistGesture(hand) and hand.is_right:
+                    print "You twisted your %s" % (handType)
+                    print self.count - 1
+                    time.sleep(2)
+                    self.count -= 1
+            elif self.level == 4 and self.count == 1:
+                self.count = 10
+                self.level += 1
+                print "Do the same with your left hand"
+            elif self.level == 5 and self.count > 1:
+                # Twist Gesture
+                if twistGesture(hand) and hand.is_left:
+                    print "You twisted your %s" % (handType)
+                    print self.count - 1
+                    time.sleep(2)
+                    self.count -= 1
+            elif self.level == 5 and self.count == 1:
+                print "Congrats! You did it!"
+                killer = True
 
 
 def fistGesture(hand):
